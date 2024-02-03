@@ -269,6 +269,10 @@ public class Commander
         return db.getDoors();
     }
 
+    public long getDoorUIDByName(String name) {
+        return db.getDoorUIDByName(name);
+    }
+
     // Returns an ArrayList of doors with a specific name.
     private ArrayList<Door> getDoors(String name)
     {

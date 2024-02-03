@@ -41,125 +41,6 @@
 
         <dependency>
             <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_11_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_12_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_13_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_13_R1_5</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_13_R2</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_14_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_15_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_16_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_16_R2</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_16_R3</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_17_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_18_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_18_R2</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_19_R1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_19_R1_1</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_19_R2</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
-            <artifactId>v1_19_R3</artifactId>
-            <version>0.1.8.49-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>nl.pim16aap2.BigDoors</groupId>
             <artifactId>v1_20_R1</artifactId>
             <version>0.1.8.49-ALPHA</version>
             <scope>compile</scope>
@@ -359,7 +240,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.8</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>antrunner</id>

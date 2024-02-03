@@ -1,6 +1,7 @@
 package nl.pim16aap2.bigDoors.GUI;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.google.common.collect.Lists;
 import nl.pim16aap2.bigDoors.BigDoors;
 import nl.pim16aap2.bigDoors.BigDoors.MCVersion;
 import nl.pim16aap2.bigDoors.Door;
@@ -16,15 +17,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("deprecation")
 public class GUI
 {
     private static final Material PAGESWITCHMAT = Material.ARROW;
@@ -47,6 +45,7 @@ public class GUI
     private static final Material NOTIFICATIONSMAT_OFF = XMaterial.MUSIC_DISC_11.parseMaterial();
     private static final Material BYPASS_PROTECTIONS_ON = XMaterial.TNT.parseMaterial();
     private static final Material BYPASS_PROTECTIONS_OFF = XMaterial.DIAMOND.parseMaterial();
+    private static final ItemStack SEARCH = XMaterial.COMPASS.parseItem();
     private static final byte LOCKEDDATA = 14;
     private static final byte UNLOCKEDDATA = 5;
     private static final byte CONFIRMDATA = 14;
@@ -86,7 +85,7 @@ public class GUI
 
     private PageType pageType;
     private int page;
-    private final ArrayList<Door> doors;
+    private ArrayList<Door> doors;
     private ArrayList<DoorOwner> owners;
     private int doorOwnerPage = 0;
     private int maxDoorOwnerPageCount = 0;
@@ -107,7 +106,30 @@ public class GUI
         page = 0;
         items = new HashMap<>();
 
-        doors = plugin.getCommander().getDoors(player.getUniqueId().toString(), null);
+        doors = Lists.newArrayList(plugin.getCommander().getDoors());
+
+        sort();
+        update();
+    }
+
+    public GUI(BigDoors plugin, Player player, String doorName) {
+        missingHeadTextures = 0;
+        this.plugin = plugin;
+        messages = plugin.getMessages();
+        this.player = player;
+
+        pageType = PageType.DOORLIST;
+        page = 0;
+        items = new HashMap<>();
+
+        long id = plugin.getCommander().getDoorUIDByName(doorName);
+        if (id == 0) {
+            close();
+            Util.messagePlayer(player, "§e§lBigDoors §8| §7Non esiste nessuna porta con questo nome.");
+            return;
+        }
+
+        doors = Lists.newArrayList(plugin.getCommander().getDoor(player.getUniqueId(), id, true));
 
         sort();
         update();
@@ -196,7 +218,11 @@ public class GUI
 
         addLore(lore, sortAlphabetically ? messages.getString("GUI.SORTED.Alphabetically") :
             messages.getString("GUI.SORTED.Numerically"));
-        items.put(1, new GUIItem(TOGGLEDOORMAT, messages.getString("GUI.SORTED.Change"), lore, 1));
+        items.put(2, new GUIItem(TOGGLEDOORMAT, messages.getString("GUI.SORTED.Change"), lore, 1));
+        lore.clear();
+
+        addLore(lore, "§7Cerca una porta in base al suo nome.");
+        items.put(1, new GUIItem(SEARCH, "§bCerca", lore, 1));
         lore.clear();
 
         addCreationBook(DoorType.DRAWBRIDGE, 3, "GUI.NewDrawbridge");
@@ -426,6 +452,13 @@ public class GUI
             update();
         }
         else if (interactionIDX == 1)
+        {
+            close();
+            BigDoors.get().getInSearch().add(player.getName());
+            Util.messagePlayer(player, "§e§lBigDoors §8| §7Invia ora il nome della porta che intendi cercare. " +
+                    "In alternativa, digita 'annulla' per annullare questa operazione.");
+        }
+        else if (interactionIDX == 2)
         {
             sortAlphabetically = !sortAlphabetically;
             sort();

@@ -5,23 +5,6 @@ import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory;
 import nl.pim16aap2.bigDoors.NMS.FallingBlockFactoryProvider_V1_20_R1;
 import nl.pim16aap2.bigDoors.NMS.FallingBlockFactoryProvider_V1_20_R2;
 import nl.pim16aap2.bigDoors.NMS.FallingBlockFactoryProvider_V1_20_R3;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_11_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_12_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_13_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_13_R1_5;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_13_R2;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_14_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_15_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_16_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_16_R2;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_16_R3;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_17_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_18_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_18_R2;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_19_R1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_19_R1_1;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_19_R2;
-import nl.pim16aap2.bigDoors.NMS.FallingBlockFactory_V1_19_R3;
 import nl.pim16aap2.bigDoors.codegeneration.FallbackGeneratorManager;
 import nl.pim16aap2.bigDoors.compatibility.FakePlayerCreator;
 import nl.pim16aap2.bigDoors.compatibility.ProtectionCompatManager;
@@ -128,13 +111,17 @@ public class BigDoors extends JavaPlugin implements Listener
     private @Nullable LoginResourcePackHandler rPackHandler;
     private TimedCache<Long /* Chunk */, HashMap<Long /* Loc */, Long /* doorUID */>> pbCache = null;
     private VaultManager vaultManager;
-    private UpdateManager updateManager;
     private volatile boolean schedulerIsRunning = false;
     private static final @NotNull MCVersion MC_VERSION = BigDoors.calculateMCVersion();
     private static final boolean IS_ON_FLATTENED_VERSION = MC_VERSION.isAtLeast(MCVersion.v1_13_R1);
     private boolean isEnabled = false;
     private final List<String> loginMessages = new ArrayList<>();
     private final WorldHeightManager worldHeightManager = new WorldHeightManager();
+    private final List<String> inSearch = new ArrayList<>();
+
+    public List<String> getInSearch() {
+        return inSearch;
+    }
 
     public BigDoors()
     {
@@ -165,7 +152,6 @@ public class BigDoors extends JavaPlugin implements Listener
         if (!schedulerIsRunning)
             Bukkit.getScheduler().runTask(this, () -> schedulerIsRunning = true);
 
-        updateManager = new UpdateManager(this);
         buildNumber = readBuildNumber();
         overrideVersion();
 
@@ -192,8 +178,6 @@ public class BigDoors extends JavaPlugin implements Listener
             getMyLogger().logMessage(Level.SEVERE, Util.throwableToString(e));
             return;
         }
-
-        updateManager.setEnabled(getConfigLoader().autoDLUpdate(), getConfigLoader().announceUpdateCheck());
 
         messages = new Messages(this);
 
@@ -413,8 +397,6 @@ public class BigDoors extends JavaPlugin implements Listener
                           "Stats disabled, not laoding stats :(... Please consider enabling it! I am a simple man, seeing higher user numbers helps me stay motivated!");
         }
 
-        updateManager.setEnabled(getConfigLoader().autoDLUpdate(), getConfigLoader().announceUpdateCheck());
-
         if (commander != null)
             commander.setCanGo(true);
     }
@@ -582,24 +564,10 @@ public class BigDoors extends JavaPlugin implements Listener
     public String getLoginMessage()
     {
         final StringBuilder sb = new StringBuilder();
-        if (updateManager.updateAvailable())
-        {
-            if (getConfigLoader().autoDLUpdate() && updateManager.hasUpdateBeenDownloaded())
-                sb.append("[BigDoors] A new update (").append(updateManager.getNewestVersion())
-                  .append(") has been downloaded! ").append("Restart your server to apply the update!\n");
-            else if (updateManager.updateAvailable())
-                sb.append("[BigDoors] A new update is available: ").append(updateManager.getNewestVersion())
-                  .append("\n");
-        }
         if (failureCommandHandler != null)
             sb.append("[BigDoors] ").append(failureCommandHandler.getError()).append("\n");
         loginMessages.forEach(str -> sb.append("[BigDoors] ").append(str).append("\n"));
         return sb.toString();
-    }
-
-    public UpdateManager getUpdateManager()
-    {
-        return updateManager;
     }
 
     public TimedCache<Long, HashMap<Long, Long>> getPBCache()
@@ -820,65 +788,22 @@ public class BigDoors extends JavaPlugin implements Listener
             case "v1_9_R1":
             case "v1_9_R2":
             case "v1_10_R1":
-                return false;
             case "v1_11_R1":
-                fabf = new FallingBlockFactory_V1_11_R1();
-                break;
             case "v1_12_R1":
-                fabf = new FallingBlockFactory_V1_12_R1();
-                break;
             case "v1_13_R1":
-                fabf = new FallingBlockFactory_V1_13_R1();
-                break;
             case "v1_13_R2":
-                if (minorVersion == 0)
-                {
-                    logger.severe("Failed to parse minor version from: \"" + Bukkit.getBukkitVersion() + "\"");
-                    return false;
-                }
-                // 1.13.1 has the same package version as 1.13.2, but there are actual NMS changes between them.
-                // That's why 1.13.1 is a kinda R1.5 package.
-                if (minorVersion == 1)
-                    fabf = new FallingBlockFactory_V1_13_R1_5();
-                else
-                    fabf = new FallingBlockFactory_V1_13_R2();
-                break;
             case "v1_14_R1":
-                fabf = new FallingBlockFactory_V1_14_R1();
-                break;
             case "v1_15_R1":
-                fabf = new FallingBlockFactory_V1_15_R1();
-                break;
             case "v1_16_R1":
-                fabf = new FallingBlockFactory_V1_16_R1();
-                break;
             case "v1_16_R2":
-                fabf = new FallingBlockFactory_V1_16_R2();
-                break;
             case "v1_16_R3":
-                fabf = new FallingBlockFactory_V1_16_R3();
-                break;
             case "v1_17_R1":
-                fabf = new FallingBlockFactory_V1_17_R1();
-                break;
             case "v1_18_R1":
-                fabf = new FallingBlockFactory_V1_18_R1();
-                break;
             case "v1_18_R2":
-                fabf = new FallingBlockFactory_V1_18_R2();
-                break;
             case "v1_19_R1":
-                if (minorVersion == 0)
-                    fabf = new FallingBlockFactory_V1_19_R1();
-                else
-                    fabf = new FallingBlockFactory_V1_19_R1_1();
-                break;
             case "v1_19_R2":
-                fabf = new FallingBlockFactory_V1_19_R2();
-                break;
             case "v1_19_R3":
-                fabf = new FallingBlockFactory_V1_19_R3();
-                break;
+                return false;
             case "v1_20_R1":
                 fabf = FallingBlockFactoryProvider_V1_20_R1.getFactory();
                 break;

@@ -2,6 +2,7 @@ package nl.pim16aap2.bigDoors.handlers;
 
 import java.text.MessageFormat;
 
+import nl.pim16aap2.bigDoors.GUI.GUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,10 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -154,4 +152,24 @@ public class EventHandlers implements Listener
         }
         src.removeItem(event.getItem());
     }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+
+        if (!BigDoors.get().getInSearch().contains(player.getName()))
+            return;
+
+        event.setCancelled(true);
+        BigDoors.get().getInSearch().remove(player.getName());
+
+        if (event.getMessage().equalsIgnoreCase("annulla")) {
+            Util.messagePlayer(player, "§e§lBigDoors §8| §7Operazione annullata correttamente!");
+            return;
+        }
+
+        Bukkit.getScheduler().runTask(plugin,
+                () -> BigDoors.get().addGUIUser(new GUI(plugin, player, event.getMessage())));
+    }
+
 }

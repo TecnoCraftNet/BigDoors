@@ -945,14 +945,13 @@ public class SQLiteJDBCDriverConnection
     }
 
     private @Nullable UUID getPrimeOwner(Connection conn, long doorUID)
-        throws SQLException
-    {
+        throws SQLException {
         UUID primeOwner = null;
         PreparedStatement ps = conn.prepareStatement(
                 "SELECT playerUUID \n" +
-                "FROM sqlUnion \n" +
-                "INNER JOIN players ON sqlUnion.playerID = players.id\n" +
-                "WHERE doorUID = '" + doorUID + "' AND permission = 0;");
+                        "FROM sqlUnion \n" +
+                        "INNER JOIN players ON sqlUnion.playerID = players.id\n" +
+                        "WHERE doorUID = '" + doorUID + "' AND permission = 0;");
 
         ResultSet rs = ps.executeQuery();
 
@@ -966,6 +965,40 @@ public class SQLiteJDBCDriverConnection
             BigDoors.get().getMyLogger().warn("Failed to find prime owner of door " + doorUID);
 
         return primeOwner;
+    }
+
+    public long getDoorUIDByName(String name) {
+        long id = 0;
+
+        Connection conn = null;
+        try
+        {
+            conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement("SELECT id FROM doors WHERE name = '" + name + "'");
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next())
+                id = rs.getLong("id");
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException | NullPointerException e)
+        {
+            logMessage("531", e);
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch (SQLException | NullPointerException e)
+            {
+                logMessage("531", e);
+            }
+        }
+
+        return id;
     }
 
     // Get a set of all doors in the database. This set is defined by doorUID.
