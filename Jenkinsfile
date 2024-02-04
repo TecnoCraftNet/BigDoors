@@ -59,7 +59,7 @@ pipeline {
           steps {
               container('maven') {
                 sh """
-                yum install -y wget
+                yum install -y wget git
                 wget -O /root/.m2/settings.xml https://gist.githubusercontent.com/zPirroZ3007/4bdcb7e6220dd34b8bf39a562ece8776/raw/settings.xml
                 """
               }
