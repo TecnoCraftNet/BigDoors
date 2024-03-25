@@ -8,7 +8,7 @@ pipeline {
       NEXUS_TECNO_OLD_USER = "${NEXUS_TECNO_OLD_USR}"
       NEXUS_TECNO_OLD_PASS = "${NEXUS_TECNO_OLD_PSW}"
 
-      DEPLOY_FILE = "build/libs/BigDoors.jar"
+      DEPLOY_FILE = "core/target/BigDoors.jar"
       DEPLOY_DEST = "plugins/BigDoors.jar"
 
       DEPLOY_CREDS = credentials('deploy')
