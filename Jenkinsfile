@@ -107,6 +107,7 @@ pipeline {
                 sh 'mvn clean package'
               }
           }
+          archiveArtifacts artifacts: 'BigDoors.jar', fingerprint: true
       }
 
       stage('Deploy') {
