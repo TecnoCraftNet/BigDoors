@@ -197,8 +197,11 @@ public class SlidingMover extends BlockMover
             @Override
             public void run()
             {
-                if (counter == 0 || (counter < endCount - 27 / tickRate && counter % (5 * tickRate / 4) == 0))
-                    Util.playSound(door.getEngine(), "bd.dragging2", 0.5f, 0.6f);
+                if (counter == 0 || (counter < endCount - 27 / tickRate && counter % (5 * tickRate / 4) == 0)) {
+                    if(world.getName().equalsIgnoreCase("tutorial"))
+                        Util.playSound(door.getEngine(), "bd.train2", 1, 1);
+                    else Util.playSound(door.getEngine(), "bd.dragging2", 0.5f, 0.6f);
+                }
 
                 lastTime = currentTime;
                 currentTime = System.nanoTime();
@@ -215,7 +218,9 @@ public class SlidingMover extends BlockMover
 
                 if (!plugin.getCommander().canGo() || counter > totalTicks || firstBlockData == null)
                 {
-                    Util.playSound(door.getEngine(), "bd.thud", 2f, 0.15f);
+                    if(world.getName().equalsIgnoreCase("tutorial"))
+                        Util.playSound(door.getEngine(), "bd.train", 1, 1);
+                    else Util.playSound(door.getEngine(), "bd.thud", 2f, 0.15f);
                     for (MyBlockData savedBlock : savedBlocks)
                         if (!savedBlock.getMat().equals(Material.AIR))
                             savedBlock.getFBlock().setVelocity(new Vector(0D, 0D, 0D));

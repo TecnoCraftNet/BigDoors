@@ -8,8 +8,8 @@ pipeline {
       NEXUS_TECNO_OLD_USER = "${NEXUS_TECNO_OLD_USR}"
       NEXUS_TECNO_OLD_PASS = "${NEXUS_TECNO_OLD_PSW}"
 
-      DEPLOY_FILE = ""
-      DEPLOY_DEST = ""
+      DEPLOY_FILE = "build/libs/BigDoors.jar"
+      DEPLOY_DEST = "plugins/BigDoors.jar"
 
       DEPLOY_CREDS = credentials('deploy')
       DEPLOY_SERVER = "${DEPLOY_CREDS_USR}"
@@ -25,6 +25,7 @@ pipeline {
         kind: Pod
         metadata:
           annotations:
+            karpenter.sh/do-not-disrupt: "true"
             dynamic-pvc-provisioner.kubernetes.io/maven-cache.enabled: "true"
             dynamic-pvc-provisioner.kubernetes.io/maven-cache.pvc: |
               apiVersion: v1
@@ -50,6 +51,27 @@ pipeline {
           - name: maven-cache
             persistentVolumeClaim:
               claimName: "${UUID.randomUUID()}"
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                    - key: beta.kubernetes.io/arch
+                      operator: In
+                      values:
+                        - amd64
+                    - key: karpenter.k8s.aws/instance-category
+                      operator: In
+                      values:
+                        - c
+                    - key: karpenter.k8s.aws/instance-generation
+                      operator: In
+                      values:
+                        - 6
+                    - key: karpenter.k8s.aws/instance-size
+                      operator: In
+                      values:
+                        - 8xlarge
         """
     }
   }
