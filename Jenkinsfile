@@ -8,8 +8,8 @@ pipeline {
       NEXUS_TECNO_OLD_USER = "${NEXUS_TECNO_OLD_USR}"
       NEXUS_TECNO_OLD_PASS = "${NEXUS_TECNO_OLD_PSW}"
 
-      DEPLOY_FILE = "core/target/BigDoors.jar"
-      DEPLOY_DEST = "plugins/BigDoors.jar"
+      DEPLOY_FILE = ""
+      DEPLOY_DEST = ""
 
       DEPLOY_CREDS = credentials('deploy')
       DEPLOY_SERVER = "${DEPLOY_CREDS_USR}"
@@ -43,6 +43,13 @@ pipeline {
             image: "maven:3.8.6-amazoncorretto-17"
             command:
             - cat
+            resources:
+              requests:
+                cpu: 4000m
+                memory: 4000Mi
+              limits:
+                cpu: 4000m
+                memory: 4000Mi
             tty: true
             volumeMounts:
               - name: maven-cache
@@ -64,14 +71,6 @@ pipeline {
                       operator: In
                       values:
                         - c
-                    - key: karpenter.k8s.aws/instance-generation
-                      operator: In
-                      values:
-                        - 6
-                    - key: karpenter.k8s.aws/instance-size
-                      operator: In
-                      values:
-                        - 8xlarge
         """
     }
   }
@@ -81,21 +80,8 @@ pipeline {
           steps {
               container('maven') {
                 sh """
-                yum install -y wget git
+                yum install -y wget
                 wget -O /root/.m2/settings.xml https://gist.githubusercontent.com/zPirroZ3007/4bdcb7e6220dd34b8bf39a562ece8776/raw/settings.xml
-                """
-              }
-          }
-      }
-
-      stage('BuildTools') {
-          steps {
-              container('maven') {
-                sh """
-                wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-                java -jar BuildTools.jar --rev 1.20.1 --remapped
-                java -jar BuildTools.jar --rev 1.20.2 --remapped
-                java -jar BuildTools.jar --rev 1.20.4 --remapped
                 """
               }
           }
@@ -106,7 +92,6 @@ pipeline {
               container('maven') {
                 sh 'mvn clean package'
               }
-              archiveArtifacts artifacts: 'core/target/*.jar', fingerprint: true
           }
       }
 
@@ -117,7 +102,6 @@ pipeline {
           steps {
              container('maven') {
                 sh '''#!/bin/bash
-
                     if [[ "${DEPLOY_FILE}" = "" ]]; then
                        exit 0
                     fi
