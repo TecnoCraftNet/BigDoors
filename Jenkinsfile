@@ -106,7 +106,7 @@ pipeline {
                 container('maven') {
                     sh 'mvn clean package'
                 }
-                archiveArtifacts artifacts: 'BigDoors.jar', fingerprint: true
+                archiveArtifacts artifacts: 'core/target/*.jar', fingerprint: true
             }
         }
 
