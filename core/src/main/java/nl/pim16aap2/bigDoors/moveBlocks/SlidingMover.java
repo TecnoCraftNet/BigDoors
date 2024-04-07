@@ -182,8 +182,10 @@ public class SlidingMover extends BlockMover
     {
         endCount = (int) (20.0f / tickRate * time);
 
-        animationRunnable = new BukkitRunnable()
-        {
+        if(world.getName().equalsIgnoreCase("tutorial"))
+            Util.playSound(door.getEngine(), "bd.train", 1, 1);
+
+        animationRunnable = new BukkitRunnable() {
             double counter = 0;
             double step = ((double) blocksToMove) / ((double) endCount);
             double stepSum = 0;
@@ -199,7 +201,7 @@ public class SlidingMover extends BlockMover
             {
                 if (counter == 0 || (counter < endCount - 27 / tickRate && counter % (5 * tickRate / 4) == 0)) {
                     if(world.getName().equalsIgnoreCase("tutorial"))
-                        Util.playSound(door.getEngine(), "bd.train2", 1, 1);
+                        Util.playSound(door.getEngine(), "bd.train_step", 1, 1);
                     else Util.playSound(door.getEngine(), "bd.dragging2", 0.5f, 0.6f);
                 }
 
@@ -219,7 +221,7 @@ public class SlidingMover extends BlockMover
                 if (!plugin.getCommander().canGo() || counter > totalTicks || firstBlockData == null)
                 {
                     if(world.getName().equalsIgnoreCase("tutorial"))
-                        Util.playSound(door.getEngine(), "bd.train", 1, 1);
+                        Util.playSound(door.getEngine(), "bd.train_end", 1, 1);
                     else Util.playSound(door.getEngine(), "bd.thud", 2f, 0.15f);
                     for (MyBlockData savedBlock : savedBlocks)
                         if (!savedBlock.getMat().equals(Material.AIR))
